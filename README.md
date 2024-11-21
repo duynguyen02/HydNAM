@@ -4,6 +4,8 @@
 
 **HydNAM** is a Python implementation of the NedborAfstromnings Model (NAM), a lumped rainfall–runoff model.
 
+This project is based on the [NAM_Model](https://github.com/hckaraman/NAM_Model) created by [hckaraman](https://github.com/hckaraman). 
+
 ## Installation
 
 ```bash
