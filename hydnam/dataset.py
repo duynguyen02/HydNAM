@@ -7,22 +7,22 @@ from hydnam.columns_constants import TIMESERIES, TEMPERATURE, PRECIPITATION, EVA
 
 
 class Dataset:
-    def __init__(self, time_series: List[datetime], temperatures: List[float],
-                 precipitations: List[float], evapotranspirations: List[float],
-                 discharges: List[float]):
-        self._time_series = time_series
-        self._temperatures = temperatures
-        self._precipitations = precipitations
-        self._evapotranspirations = evapotranspirations
-        self._discharges = discharges
+    def __init__(self, timeseries: List[datetime], temperature: List[float],
+                 precipitation: List[float], evapotranspiration: List[float],
+                 discharge: List[float]):
+        self._timeseries = timeseries
+        self._temperature = temperature
+        self._precipitation = precipitation
+        self._evapotranspiration = evapotranspiration
+        self._discharge = discharge
 
     def to_dataframe(self):
         dataset_dict = {
-            TIMESERIES: self._time_series,
-            TEMPERATURE: self._temperatures,
-            PRECIPITATION: self._precipitations,
-            EVAPOTRANSPIRATION: self._evapotranspirations,
-            DISCHARGE: self._discharges
+            TIMESERIES: self._timeseries,
+            TEMPERATURE: self._temperature,
+            PRECIPITATION: self._precipitation,
+            EVAPOTRANSPIRATION: self._evapotranspiration,
+            DISCHARGE: self._discharge
         }
 
         df = pd.DataFrame(dataset_dict)
