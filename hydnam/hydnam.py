@@ -160,9 +160,9 @@ class HydNAM:
         lfrac = _l / lmax
         fact = self._flow_rate
 
-        q_sim = pd.Series(0.0, index=range(sr.P.size))
-        l_soil, u_soil, s_snow, q_snow = (pd.Series(0.0, index=range(sr.P.size)) for _ in range(4))
-        q_inter, e_eal, q_of, q_g, q_bf = (pd.Series(0.0, index=range(sr.P.size)) for _ in range(5))
+        q_sim = np.zeros(sr.P.size)
+        l_soil, u_soil, s_snow, q_snow = (np.zeros(sr.P.size) for _ in range(4))
+        q_inter, e_eal, q_of, q_g, q_bf = (np.zeros(sr.P.size) for _ in range(5))
 
         for t, (prec, evap, temp) in enumerate(zip(sr.P, sr.E, sr.T)):
             if temp < snowtemp:

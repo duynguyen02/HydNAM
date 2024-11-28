@@ -1,26 +1,27 @@
 import dataclasses
 from typing import Optional
 
+import numpy as np
 import pandas as pd
 
 
 @dataclasses.dataclass
 class SimulationResult:
     timeseries: Optional[pd.Series] = None
-    T: Optional[pd.Series] = None
-    P: Optional[pd.Series] = None
-    E: Optional[pd.Series] = None
-    Q_obs: Optional[pd.Series] = None
-    U_soil: Optional[pd.Series] = None
-    S_snow: Optional[pd.Series] = None
-    Q_snow: Optional[pd.Series] = None
-    Q_inter: Optional[pd.Series] = None
-    E_eal: Optional[pd.Series] = None
-    Q_of: Optional[pd.Series] = None
-    Q_g: Optional[pd.Series] = None
-    Q_bf: Optional[pd.Series] = None
-    Q_sim: Optional[pd.Series] = None
-    L_soil: Optional[pd.Series] = None
+    T: Optional[np.ndarray] = None
+    P: Optional[np.ndarray] = None
+    E: Optional[np.ndarray] = None
+    Q_obs: Optional[np.ndarray] = None
+    U_soil: Optional[np.ndarray] = None
+    S_snow: Optional[np.ndarray] = None
+    Q_snow: Optional[np.ndarray] = None
+    Q_inter: Optional[np.ndarray] = None
+    E_eal: Optional[np.ndarray] = None
+    Q_of: Optional[np.ndarray] = None
+    Q_g: Optional[np.ndarray] = None
+    Q_bf: Optional[np.ndarray] = None
+    Q_sim: Optional[np.ndarray] = None
+    L_soil: Optional[np.ndarray] = None
 
     def to_dataframe(self):
         data = {field.name: getattr(self, field.name) for field in dataclasses.fields(self)}
