@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
 
-from hydnam.columns_constants import TIME_SERIES, INTERVAL, TEMPERATURES, PRECIPITATIONS, EVAPOTRANSPIRATIONS, DISCHARGES
+from hydnam.columns_constants import TIMESERIES, INTERVAL, TEMPERATURE, PRECIPITATION, EVAPOTRANSPIRATION, DISCHARGE
 from hydnam.dataset import Dataset
 from hydnam.parameters import Parameters
 from hydnam.simulation_result import SimulationResult
@@ -14,10 +14,10 @@ from hydnam.statistics import Statistics
 
 
 def validate_time_series(df: pd.DataFrame):
-    if not df[TIME_SERIES].is_monotonic_increasing:
+    if not df[TIMESERIES].is_monotonic_increasing:
         raise ValueError("The time series is not strictly increasing.")
 
-    time_diffs = df[TIME_SERIES].diff().dropna()
+    time_diffs = df[TIMESERIES].diff().dropna()
     if not time_diffs.nunique() == 1:
         raise ValueError("The intervals between datetimes are not consistent.")
 
@@ -97,7 +97,7 @@ class HydNAM:
 
     def _validate_interval(self, df: pd.DataFrame):
         df = df.copy()
-        df[INTERVAL] = df[TIME_SERIES].diff()
+        df[INTERVAL] = df[TIMESERIES].diff()
         interval_hours = pd.Timedelta(hours=self._interval)
         is_valid_interval_hours = df[INTERVAL].dropna().eq(interval_hours).all()
         if not is_valid_interval_hours:
@@ -111,11 +111,11 @@ class HydNAM:
         start = self._start
         end = self._end
 
-        if not pd.api.types.is_datetime64_any_dtype(df[TIME_SERIES]):
+        if not pd.api.types.is_datetime64_any_dtype(df[TIMESERIES]):
             raise ValueError("The TIME_SERIES column must be of datetime type.")
 
-        min_time = df[TIME_SERIES].min()
-        max_time = df[TIME_SERIES].max()
+        min_time = df[TIMESERIES].min()
+        max_time = df[TIMESERIES].max()
 
         if start is not None and (start < min_time or start > max_time):
             raise ValueError("The 'start' parameter is out of the DataFrame's time range.")
@@ -129,11 +129,11 @@ class HydNAM:
         if start is None and end is None:
             return df
         elif start is None:
-            return df[df[TIME_SERIES] <= end]
+            return df[df[TIMESERIES] <= end]
         elif end is None:
-            return df[df[TIME_SERIES] >= start]
+            return df[df[TIMESERIES] >= start]
         else:
-            return df[(df[TIME_SERIES] >= start) & (df[TIME_SERIES] <= end)]
+            return df[(df[TIMESERIES] >= start) & (df[TIMESERIES] <= end)]
 
     def _validate_dataset_n_provide_dataframe(self):
         df = self._dataset.to_dataframe()
@@ -235,11 +235,11 @@ class HydNAM:
 
     def _init_input(self, df: pd.DataFrame):
         sr = self._simulation_result
-        sr.timeseries = df[TIME_SERIES].reset_index(drop=True)
-        sr.T = df[TEMPERATURES].reset_index(drop=True)
-        sr.P = df[PRECIPITATIONS].reset_index(drop=True)
-        sr.E = df[EVAPOTRANSPIRATIONS].reset_index(drop=True)
-        sr.Q_obs = df[DISCHARGES].reset_index(drop=True)
+        sr.timeseries = df[TIMESERIES].reset_index(drop=True)
+        sr.T = df[TEMPERATURE].reset_index(drop=True)
+        sr.P = df[PRECIPITATION].reset_index(drop=True)
+        sr.E = df[EVAPOTRANSPIRATION].reset_index(drop=True)
+        sr.Q_obs = df[DISCHARGE].reset_index(drop=True)
         sr.Q_sim = pd.Series(0.0, index=range(df.size))
         sr.L_soil = pd.Series(0.0, index=range(df.size))
 

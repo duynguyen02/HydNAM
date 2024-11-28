@@ -3,7 +3,7 @@ from typing import List
 
 import pandas as pd
 
-from hydnam.columns_constants import TIME_SERIES, TEMPERATURES, PRECIPITATIONS, EVAPOTRANSPIRATIONS, DISCHARGES
+from hydnam.columns_constants import TIMESERIES, TEMPERATURE, PRECIPITATION, EVAPOTRANSPIRATION, DISCHARGE
 
 
 class Dataset:
@@ -18,13 +18,13 @@ class Dataset:
 
     def to_dataframe(self):
         dataset_dict = {
-            TIME_SERIES: self._time_series,
-            TEMPERATURES: self._temperatures,
-            PRECIPITATIONS: self._precipitations,
-            EVAPOTRANSPIRATIONS: self._evapotranspirations,
-            DISCHARGES: self._discharges
+            TIMESERIES: self._time_series,
+            TEMPERATURE: self._temperatures,
+            PRECIPITATION: self._precipitations,
+            EVAPOTRANSPIRATION: self._evapotranspirations,
+            DISCHARGE: self._discharges
         }
 
         df = pd.DataFrame(dataset_dict)
-        df[TIME_SERIES] = pd.to_datetime(df[TIME_SERIES])
+        df[TIMESERIES] = pd.to_datetime(df[TIMESERIES])
         return df

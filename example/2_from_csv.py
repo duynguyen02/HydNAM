@@ -3,7 +3,7 @@ from datetime import datetime
 import pandas as pd
 
 from hydnam.chart import plot_q
-from hydnam.columns_constants import TIME_SERIES, TEMPERATURES, PRECIPITATIONS, EVAPOTRANSPIRATIONS, DISCHARGES
+from hydnam.columns_constants import TIMESERIES, TEMPERATURE, PRECIPITATION, EVAPOTRANSPIRATION, DISCHARGE
 from hydnam.dataset import Dataset
 from hydnam.hydnam import HydNAM
 from hydnam.parameters import Parameters
@@ -11,11 +11,11 @@ from hydnam.parameters import Parameters
 df = pd.read_csv('data.csv')
 
 dataset = Dataset(
-    time_series=df[TIME_SERIES].tolist(),
-    temperatures=df[TEMPERATURES].tolist(),
-    precipitations=df[PRECIPITATIONS].tolist(),
-    evapotranspirations=df[EVAPOTRANSPIRATIONS].tolist(),
-    discharges=df[DISCHARGES].tolist(),
+    time_series=df[TIMESERIES].tolist(),
+    temperatures=df[TEMPERATURE].tolist(),
+    precipitations=df[PRECIPITATION].tolist(),
+    evapotranspirations=df[EVAPOTRANSPIRATION].tolist(),
+    discharges=df[DISCHARGE].tolist(),
 )
 
 params = Parameters()
