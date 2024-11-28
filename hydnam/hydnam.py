@@ -78,6 +78,14 @@ class HydNAM:
     @property
     def end(self) -> datetime:
         return self._end
+    
+    @property
+    def spin_off(self) -> float:
+        return self._spin_off
+    
+    @property
+    def ignore_snow(self) -> bool:
+        return self._ignore_snow
 
     @property
     def statistics(self) -> Statistics:
