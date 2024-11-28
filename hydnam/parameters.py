@@ -31,7 +31,7 @@ class Parameters:
             (0, 1),  # tg
             (500, 5000),  # ckbf
             (0, 0) if ignore_snow else (0, 4),  # csnow
-            (0, 0) if ignore_snow else (-2, 4)  # snowtemp
+            (-999, -998) if ignore_snow else (-2, 4)  # snowtemp
         )
         return bounds
 
