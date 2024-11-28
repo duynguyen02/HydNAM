@@ -11,11 +11,11 @@ from hydnam.parameters import Parameters
 df = pd.read_csv('data.csv')
 
 dataset = Dataset(
-    time_series=df[TIMESERIES].tolist(),
-    temperatures=df[TEMPERATURE].tolist(),
-    precipitations=df[PRECIPITATION].tolist(),
-    evapotranspirations=df[EVAPOTRANSPIRATION].tolist(),
-    discharges=df[DISCHARGE].tolist(),
+    timeseries=df[TIMESERIES].tolist(),
+    temperature=df[TEMPERATURE].tolist(),
+    precipitation=df[PRECIPITATION].tolist(),
+    evapotranspiration=df[EVAPOTRANSPIRATION].tolist(),
+    discharge=df[DISCHARGE].tolist(),
 )
 
 params = Parameters()

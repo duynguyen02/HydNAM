@@ -41,15 +41,15 @@ from hydnam.hydnam import HydNAM
 from hydnam.parameters import Parameters
 
 dataset = Dataset(
-    time_series=[
+    timeseries=[
         datetime(2016, 10, 9),
         datetime(2016, 10, 10),
         datetime(2016, 10, 11),
     ],
-    temperatures=[15.4, 14.4, 14.9],
-    precipitations=[0.0, 0.0, 0.0],
-    evapotranspirations=[2.79, 3.46, 3.65],
-    discharges=[0.25694, 0.25812, 0.30983]
+    temperature=[15.4, 14.4, 14.9],
+    precipitation=[0.0, 0.0, 0.0],
+    evapotranspiration=[2.79, 3.46, 3.65],
+    discharge=[0.25694, 0.25812, 0.30983]
 )
 
 params = Parameters(
