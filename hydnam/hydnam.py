@@ -6,11 +6,11 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
 
-from .columns_constants import TIME_SERIES, INTERVAL, TEMPERATURES, PRECIPITATIONS, EVAPOTRANSPIRATIONS, DISCHARGES
-from .dataset import Dataset
-from .parameters import Parameters
-from .simulation_result import SimulationResult
-from .statistics import Statistics
+from hydnam.columns_constants import TIME_SERIES, INTERVAL, TEMPERATURES, PRECIPITATIONS, EVAPOTRANSPIRATIONS, DISCHARGES
+from hydnam.dataset import Dataset
+from hydnam.parameters import Parameters
+from hydnam.simulation_result import SimulationResult
+from hydnam.statistics import Statistics
 
 
 def validate_time_series(df: pd.DataFrame):

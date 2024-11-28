@@ -3,7 +3,7 @@ import io
 import matplotlib.pyplot as plt
 from PIL import Image
 
-from .simulation_result import SimulationResult
+from hydnam.simulation_result import SimulationResult
 
 
 def plot_q(simulation_result: SimulationResult, only_obs_and_sim: bool = False):
