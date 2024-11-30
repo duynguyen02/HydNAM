@@ -12,6 +12,7 @@ class SimulationResult:
     P: Optional[np.ndarray] = None
     E: Optional[np.ndarray] = None
     Q_obs: Optional[np.ndarray] = None
+    Q_sim: Optional[np.ndarray] = None
     U_soil: Optional[np.ndarray] = None
     S_snow: Optional[np.ndarray] = None
     Q_snow: Optional[np.ndarray] = None
@@ -19,8 +20,7 @@ class SimulationResult:
     E_eal: Optional[np.ndarray] = None
     Q_of: Optional[np.ndarray] = None
     Q_g: Optional[np.ndarray] = None
-    Q_bf: Optional[np.ndarray] = None
-    Q_sim: Optional[np.ndarray] = None
+    Q_bf: Optional[np.ndarray] = None    
     L_soil: Optional[np.ndarray] = None
 
     def to_dataframe(self):
