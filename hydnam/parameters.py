@@ -19,7 +19,7 @@ class Parameters:
     snowtemp: float = 0.0
 
     @staticmethod
-    def get_bounds(ignore_snow: bool = False):
+    def get_bounds():
         bounds = (
             (0.01, 50),  # umax
             (0.01, 1000),  # lmax
@@ -30,25 +30,27 @@ class Parameters:
             (0, 1),  # tif
             (0, 1),  # tg
             (500, 5000),  # ckbf
-            (0, 0) if ignore_snow else (0, 4),  # csnow
-            (-999, -998) if ignore_snow else (-2, 4)  # snowtemp
+            (0, 4),  # csnow
+            (-2, 4),  # snowtemp
         )
         return bounds
 
     def to_initial_params(self):
-        return np.array([
-            self.umax,
-            self.lmax,
-            self.cqof,
-            self.ckif,
-            self.ck12,
-            self.tof,
-            self.tif,
-            self.tg,
-            self.ckbf,
-            self.csnow,
-            self.snowtemp,
-        ])
+        return np.array(
+            [
+                self.umax,
+                self.lmax,
+                self.cqof,
+                self.ckif,
+                self.ck12,
+                self.tof,
+                self.tif,
+                self.tg,
+                self.ckbf,
+                self.csnow,
+                self.snowtemp,
+            ]
+        )
 
     def from_params(self, params):
         field_names = [field.name for field in dataclasses.fields(self)]
@@ -68,7 +70,9 @@ class Parameters:
 
         for i, (param, bound) in enumerate(zip(params, self.get_bounds())):
             if not (bound[0] <= param <= bound[1]):
-                raise ValueError(f"Attribute '{field_names[i]}' with value {param} is out of bounds {bound}")
+                raise ValueError(
+                    f"Attribute '{field_names[i]}' with value {param} is out of bounds {bound}"
+                )
 
     def __post_init__(self):
         self._validate()
