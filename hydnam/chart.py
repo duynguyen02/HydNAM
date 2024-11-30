@@ -6,12 +6,18 @@ from PIL import Image
 from hydnam.simulation_result import SimulationResult
 
 
-def plot_q(simulation_result: SimulationResult, only_obs_and_sim: bool = False):
+def plot_q(
+    simulation_result: SimulationResult, only_obs_and_sim: bool = False, figsize=(10, 6)
+):
     sr = simulation_result
 
-    plt.figure(figsize=(10, 6))
-    plt.plot(sr.timeseries, sr.Q_obs, label="Q_obs", color='blue', linestyle='--', marker='o')
-    plt.plot(sr.timeseries, sr.Q_sim, label="Q_sim", color='red', linestyle='--', marker='o')
+    plt.figure(figsize=figsize)
+    plt.plot(
+        sr.timeseries, sr.Q_obs, label="Q_obs", color="blue", linestyle="--", marker="o"
+    )
+    plt.plot(
+        sr.timeseries, sr.Q_sim, label="Q_sim", color="red", linestyle="--", marker="o"
+    )
 
     if not only_obs_and_sim:
         plt.plot(sr.timeseries, sr.Q_snow, label="Q_snow")
@@ -26,7 +32,7 @@ def plot_q(simulation_result: SimulationResult, only_obs_and_sim: bool = False):
     plt.grid(True)
 
     buf = io.BytesIO()
-    plt.savefig(buf, format='PNG')
+    plt.savefig(buf, format="PNG")
     buf.seek(0)
 
     image = Image.open(buf)
