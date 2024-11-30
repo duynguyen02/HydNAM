@@ -2,43 +2,39 @@ import math
 from datetime import datetime
 from typing import Optional
 
+from hydutils.df_validation import (
+    validate_columns_for_nulls,
+    validate_interval,
+    filter_timeseries,
+)
+from hydutils.hyd_constants import (
+    TIMESERIES,
+    INTERVAL,
+    TEMPERATURE,
+    PRECIPITATION,
+    EVAPOTRANSPIRATION,
+    DISCHARGE,
+)
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
 
-from hydnam.columns_constants import TIMESERIES, INTERVAL, TEMPERATURE, PRECIPITATION, EVAPOTRANSPIRATION, DISCHARGE
 from hydnam.dataset import Dataset
 from hydnam.parameters import Parameters
 from hydnam.simulation_result import SimulationResult
 from hydnam.statistics import Statistics
 
 
-def validate_time_series(df: pd.DataFrame):
-    if not df[TIMESERIES].is_monotonic_increasing:
-        raise ValueError("The time series is not strictly increasing.")
-
-    time_diffs = df[TIMESERIES].diff().dropna()
-    if not time_diffs.nunique() == 1:
-        raise ValueError("The intervals between datetimes are not consistent.")
-
-
-def validate_columns_data(df: pd.DataFrame):
-    for column in df.columns:
-        if df[column].isnull().any():
-            raise ValueError(f"The column '{column}' contains missing data. Please ensure all columns are filled.")
-
-
 class HydNAM:
     def __init__(
-            self,
-            dataset: Dataset,
-            parameters: Parameters,
-            area: float,
-            interval: float = 24.0,
-            start: Optional[datetime] = None,
-            end: Optional[datetime] = None,
-            spin_off: float = 0.0,
-            ignore_snow: bool = True,
+        self,
+        dataset: Dataset,
+        parameters: Parameters,
+        area: float,
+        interval: float = 24.0,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        spin_off: float = 0.0
     ):
         self._dataset = dataset
         self._parameters = parameters
@@ -48,7 +44,6 @@ class HydNAM:
         self._start = start
         self._end = end
         self._spin_off = spin_off
-        self._ignore_snow = ignore_snow
 
         self._statistics = Statistics()
         self._simulation_result = SimulationResult()
@@ -78,11 +73,11 @@ class HydNAM:
     @property
     def end(self) -> datetime:
         return self._end
-    
+
     @property
     def spin_off(self) -> float:
         return self._spin_off
-    
+
     @property
     def ignore_snow(self) -> bool:
         return self._ignore_snow
@@ -95,51 +90,10 @@ class HydNAM:
     def simulation_result(self) -> SimulationResult:
         return self._simulation_result
 
-    def _validate_interval(self, df: pd.DataFrame):
-        df = df.copy()
-        df[INTERVAL] = df[TIMESERIES].diff()
-        interval_hours = pd.Timedelta(hours=self._interval)
-        is_valid_interval_hours = df[INTERVAL].dropna().eq(interval_hours).all()
-        if not is_valid_interval_hours:
-            raise ValueError(f"The intervals between datetimes are not consistent. Require: {self._interval}")
-        df = df.drop(columns=[INTERVAL])
-        return df
-
-    def _filter_timeseries(self, df: pd.DataFrame):
-        df = df.copy()
-
-        start = self._start
-        end = self._end
-
-        if not pd.api.types.is_datetime64_any_dtype(df[TIMESERIES]):
-            raise ValueError("The TIME_SERIES column must be of datetime type.")
-
-        min_time = df[TIMESERIES].min()
-        max_time = df[TIMESERIES].max()
-
-        if start is not None and (start < min_time or start > max_time):
-            raise ValueError("The 'start' parameter is out of the DataFrame's time range.")
-
-        if end is not None and (end < min_time or end > max_time):
-            raise ValueError("The 'end' parameter is out of the DataFrame's time range.")
-
-        if start is not None and end is not None and end < start:
-            raise ValueError("The 'end' parameter cannot be earlier than the 'start' parameter.")
-
-        if start is None and end is None:
-            return df
-        elif start is None:
-            return df[df[TIMESERIES] <= end]
-        elif end is None:
-            return df[df[TIMESERIES] >= start]
-        else:
-            return df[(df[TIMESERIES] >= start) & (df[TIMESERIES] <= end)]
-
     def _validate_dataset_n_provide_dataframe(self):
         df = self._dataset.to_dataframe()
-        validate_columns_data(df)
-        validate_time_series(df)
-        df = self._validate_interval(df)
+        df = validate_columns_for_nulls(df)
+        df = validate_interval(df, self._interval)
         return df
 
     def _compute_nam(self, x):
@@ -194,16 +148,16 @@ class HydNAM:
                 g = (lfrac - tg) / (1 - tg) * (pn - qof) if lfrac > tg else 0
                 gsum += g
 
-            c = np.exp(-1. / ckbf)
+            c = np.exp(-1.0 / ckbf)
             bf = bf * c + gsum * carea * (1 - c)
 
-            c = np.exp(-1. / ck12)
+            c = np.exp(-1.0 / ck12)
             if1 = if1 * c + qif * (1 - c)
             if2 = if2 * c + if1 * (1 - c)
 
             of = 0.5 * (of1 + of2) / interval
             ckqof = ck12 * (of / qofmin) ** (-beta) if of > qofmin else ck12
-            c = np.exp(-1. / ckqof)
+            c = np.exp(-1.0 / ckqof)
             of1 = of1 * c + qofsum * (1 - c)
             of2 = of2 * c + of1 * (1 - c)
 
@@ -235,22 +189,17 @@ class HydNAM:
 
     def _init_input(self, df: pd.DataFrame):
         sr = self._simulation_result
-        sr.timeseries = df[TIMESERIES].reset_index(drop=True)
-        sr.T = df[TEMPERATURE].reset_index(drop=True)
-        sr.P = df[PRECIPITATION].reset_index(drop=True)
-        sr.E = df[EVAPOTRANSPIRATION].reset_index(drop=True)
-        sr.Q_obs = df[DISCHARGE].reset_index(drop=True)
-        sr.Q_sim = pd.Series(0.0, index=range(df.size))
-        sr.L_soil = pd.Series(0.0, index=range(df.size))
+        sr.timeseries = df[TIMESERIES].reset_index(drop=True).to_numpy()
+        sr.T = df[TEMPERATURE].reset_index(drop=True).to_numpy()
+        sr.P = df[PRECIPITATION].reset_index(drop=True).to_numpy()
+        sr.E = df[EVAPOTRANSPIRATION].reset_index(drop=True).to_numpy()
+        sr.Q_obs = df[DISCHARGE].reset_index(drop=True).to_numpy()
+        sr.Q_sim = pd.Series(0.0, index=range(df.size)).to_numpy()
+        sr.L_soil = pd.Series(0.0, index=range(df.size)).to_numpy()
 
     def _stats(self):
         sr = self._simulation_result
-        stats = self._statistics
-        mean = np.mean(sr.Q_obs)
-        stats.nse = 1 - (sum((sr.Q_sim - sr.Q_obs) ** 2) /
-                         sum((sr.Q_obs - mean) ** 2))
-        stats.rmse = float(np.sqrt(sum((sr.Q_sim - sr.Q_obs) ** 2) / len(sr.Q_sim)))
-        stats.fbias = (sum(sr.Q_obs - sr.Q_sim) / sum(sr.Q_obs)) * 100
+        self._statistics.stats(sr.Q_obs, sr.Q_sim)
 
     def _objective(self, x):
         sr = self._simulation_result
@@ -260,18 +209,20 @@ class HydNAM:
 
     def _run_model(self, opz: bool = False):
         df = self._validate_dataset_n_provide_dataframe()
-        df = self._filter_timeseries(df)
+        df = filter_timeseries(df, start=self._start, end=self._end)
         self._init_input(df)
 
-        params = minimize(
-            self._objective,
-            self._parameters.to_initial_params(),
-            method='SLSQP',
-            bounds=self._parameters.get_bounds(self._ignore_snow),
-            options={
-                'maxiter': 1e8, 'disp': True, 'eps': 0.01
-            }
-        ).x if opz else self._parameters.to_initial_params()
+        params = (
+            minimize(
+                self._objective,
+                self._parameters.to_initial_params(),
+                method="SLSQP",
+                bounds=self._parameters.get_bounds(),
+                options={"maxiter": 1e8, "disp": True, "eps": 0.01},
+            ).x
+            if opz
+            else self._parameters.to_initial_params()
+        )
 
         self._compute_nam(params)
 
