@@ -73,8 +73,7 @@ nam = HydNAM(
     interval=24.0,
     start=None,
     end=None,
-    spin_off=0.0,
-    ignore_snow=False
+    spin_off=0.0
 )
 print(f'Parameters: {nam.parameters}')
 print(f'Statistics: {nam.statistics}')

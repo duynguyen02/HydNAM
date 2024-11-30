@@ -1,14 +1,20 @@
 from datetime import datetime
 
+from hydutils.hyd_constants import (
+    TIMESERIES,
+    TEMPERATURE,
+    PRECIPITATION,
+    EVAPOTRANSPIRATION,
+    DISCHARGE,
+)
 import pandas as pd
 
 from hydnam.chart import plot_q
-from hydnam.columns_constants import TIMESERIES, TEMPERATURE, PRECIPITATION, EVAPOTRANSPIRATION, DISCHARGE
 from hydnam.dataset import Dataset
 from hydnam.hydnam import HydNAM
 from hydnam.parameters import Parameters
 
-df = pd.read_csv('data.csv')
+df = pd.read_csv("example/data.csv")
 
 dataset = Dataset(
     timeseries=df[TIMESERIES].tolist(),
@@ -26,15 +32,18 @@ params.from_params(
 nam = HydNAM(
     dataset=dataset,
     parameters=params,
-    area=58.8,
+    area=24.56,
     interval=24.0,
-    start=datetime(2017, 12, 1),
-    end=datetime(2017, 12, 30),
+    start=datetime(2019, 6, 1),
+    end=datetime(2019, 9, 1),
     spin_off=0.0,
-    ignore_snow=False
 )
 
-print(f'Parameters: {nam.parameters}')
-print(f'Statistics: {nam.statistics}')
+# nam.optimize()
+
+print(f"Parameters: {nam.parameters}")
+print(f"Statistics: {nam.statistics}")
 
 plot_q(nam.simulation_result).show()
+
+nam.simulation_result.to_dataframe().to_csv('result.csv', index=False)
