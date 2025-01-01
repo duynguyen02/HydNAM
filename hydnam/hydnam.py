@@ -1,7 +1,10 @@
 import math
+import uuid
 from datetime import datetime
 from typing import Optional
 
+import numpy as np
+import pandas as pd
 from hydutils.df_validation import (
     validate_columns_for_nulls,
     validate_interval,
@@ -9,14 +12,11 @@ from hydutils.df_validation import (
 )
 from hydutils.hyd_constants import (
     TIMESERIES,
-    INTERVAL,
     TEMPERATURE,
     PRECIPITATION,
     EVAPOTRANSPIRATION,
     DISCHARGE,
 )
-import numpy as np
-import pandas as pd
 from scipy.optimize import minimize
 
 from hydnam.dataset import Dataset
@@ -27,14 +27,14 @@ from hydnam.statistics import Statistics
 
 class HydNAM:
     def __init__(
-        self,
-        dataset: Dataset,
-        parameters: Parameters,
-        area: float,
-        interval: float = 24.0,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None,
-        spin_off: float = 0.0
+            self,
+            dataset: Dataset,
+            parameters: Parameters,
+            area: float,
+            interval: float = 24.0,
+            start: Optional[datetime] = None,
+            end: Optional[datetime] = None,
+            spin_off: float = 0.0
     ):
         self._dataset = dataset
         self._parameters = parameters
@@ -48,7 +48,17 @@ class HydNAM:
         self._statistics = Statistics()
         self._simulation_result = SimulationResult()
 
+        self._name = uuid.uuid4().hex
+
         self._run_model(opz=False)
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name: str):
+        self._name = name
 
     @property
     def dataset(self) -> Dataset:
@@ -231,6 +241,11 @@ class HydNAM:
 
     def set_parameters(self, parameters: Parameters):
         self._parameters = parameters
+        self._run_model(opz=False)
+
+    def reset_dataset(self, dataset: Dataset, interval: Optional[float]):
+        self._dataset = dataset
+        self._interval = interval if interval is not None else self._interval
         self._run_model(opz=False)
 
     def __str__(self):
